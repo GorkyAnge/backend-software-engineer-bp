@@ -1,8 +1,6 @@
 package com.gorkyange.bp.application.service;
 
-import com.gorkyange.bp.application.port.in.CrearMovimientoUseCase;
-import com.gorkyange.bp.application.port.in.ListarMovimientosUseCase;
-import com.gorkyange.bp.application.port.in.ObtenerCuentaUseCase;
+import com.gorkyange.bp.application.port.in.*;
 import com.gorkyange.bp.application.port.out.MovimientoRepositoryPort;
 import com.gorkyange.bp.domain.model.Cuenta;
 import com.gorkyange.bp.domain.model.Movimiento;
@@ -10,9 +8,12 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class MovimientoService implements CrearMovimientoUseCase, ListarMovimientosUseCase {
+public class MovimientoService implements CrearMovimientoUseCase, ListarMovimientosUseCase, 
+                                          ObtenerMovimientoUseCase, ActualizarMovimientoUseCase, 
+                                          EliminarMovimientoUseCase {
 
     private final MovimientoRepositoryPort movimientoRepository;
     private final ObtenerCuentaUseCase obtenerCuentaUseCase;
@@ -70,5 +71,50 @@ public class MovimientoService implements CrearMovimientoUseCase, ListarMovimien
     @Override
     public List<Movimiento> listarPorClienteYFechas(Long clienteId, LocalDate fechaInicio, LocalDate fechaFin) {
         return movimientoRepository.buscarPorClienteYFechas(clienteId, fechaInicio, fechaFin);
+    }
+
+    @Override
+    public Optional<Movimiento> obtenerPorId(Long id) {
+        return movimientoRepository.buscarPorId(id);
+    }
+
+    @Override
+    public Movimiento actualizar(Long id, Movimiento movimiento) {
+        Movimiento existente = movimientoRepository.buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Movimiento no encontrado: " + id));
+        
+        // Mantener ID y recalcular saldo si cambia el valor
+        movimiento.setId(existente.getId());
+        
+        if (!movimiento.getValor().equals(existente.getValor()) || 
+            !movimiento.getNumeroCuenta().equals(existente.getNumeroCuenta())) {
+            // Recalcular saldo
+            Cuenta cuenta = obtenerCuentaUseCase.obtenerPorNumeroCuenta(movimiento.getNumeroCuenta())
+                    .orElseThrow(() -> new RuntimeException("Cuenta no encontrada: " + movimiento.getNumeroCuenta()));
+            
+            Double saldoActual = movimientoRepository.buscarUltimoPorCuenta(movimiento.getNumeroCuenta())
+                    .map(Movimiento::getSaldo)
+                    .orElse(cuenta.getSaldoInicial());
+            
+            Double nuevoSaldo = saldoActual + movimiento.getValor();
+            
+            if (movimiento.getValor() < 0 && nuevoSaldo < 0) {
+                throw new RuntimeException("Saldo no disponible");
+            }
+            
+            movimiento.setSaldo(nuevoSaldo);
+        } else {
+            movimiento.setSaldo(existente.getSaldo());
+        }
+        
+        return movimientoRepository.guardar(movimiento);
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        if (!movimientoRepository.buscarPorId(id).isPresent()) {
+            throw new RuntimeException("Movimiento no encontrado: " + id);
+        }
+        movimientoRepository.eliminar(id);
     }
 }
