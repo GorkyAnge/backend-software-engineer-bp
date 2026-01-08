@@ -25,6 +25,10 @@ public class MovimientoRestMapper {
         response.setValor(movimiento.getValor());
         response.setSaldo(movimiento.getSaldo());
         response.setNumeroCuenta(movimiento.getNumeroCuenta());
+        response.setCliente(movimiento.getNombreCliente());
+        response.setTipoCuenta(movimiento.getTipoCuenta());
+        response.setSaldoInicial(movimiento.getSaldoInicial());
+        response.setEstado(movimiento.getEstadoCuenta());
         return response;
     }
 }

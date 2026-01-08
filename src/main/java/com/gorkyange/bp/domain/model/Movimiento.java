@@ -10,6 +10,12 @@ public class Movimiento {
     private Double valor;
     private Double saldo;
     private String numeroCuenta;
+    
+    // Campos enriquecidos para el response
+    private String nombreCliente;
+    private String tipoCuenta;
+    private Double saldoInicial;
+    private Boolean estadoCuenta;
 
     public Movimiento() {
     }
@@ -68,5 +74,37 @@ public class Movimiento {
 
     public void setNumeroCuenta(String numeroCuenta) {
         this.numeroCuenta = numeroCuenta;
+    }
+
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+
+    public void setNombreCliente(String nombreCliente) {
+        this.nombreCliente = nombreCliente;
+    }
+
+    public String getTipoCuenta() {
+        return tipoCuenta;
+    }
+
+    public void setTipoCuenta(String tipoCuenta) {
+        this.tipoCuenta = tipoCuenta;
+    }
+
+    public Double getSaldoInicial() {
+        return saldoInicial;
+    }
+
+    public void setSaldoInicial(Double saldoInicial) {
+        this.saldoInicial = saldoInicial;
+    }
+
+    public Boolean getEstadoCuenta() {
+        return estadoCuenta;
+    }
+
+    public void setEstadoCuenta(Boolean estadoCuenta) {
+        this.estadoCuenta = estadoCuenta;
     }
 }

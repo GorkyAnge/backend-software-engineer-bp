@@ -1,9 +1,8 @@
 package com.gorkyange.bp.application.service;
 
-import com.gorkyange.bp.application.port.in.CrearMovimientoUseCase;
-import com.gorkyange.bp.application.port.in.ListarMovimientosUseCase;
-import com.gorkyange.bp.application.port.in.ObtenerCuentaUseCase;
+import com.gorkyange.bp.application.port.in.*;
 import com.gorkyange.bp.application.port.out.MovimientoRepositoryPort;
+import com.gorkyange.bp.domain.model.Cliente;
 import com.gorkyange.bp.domain.model.Cuenta;
 import com.gorkyange.bp.domain.model.Movimiento;
 import org.springframework.stereotype.Service;
@@ -16,11 +15,14 @@ public class MovimientoService implements CrearMovimientoUseCase, ListarMovimien
 
     private final MovimientoRepositoryPort movimientoRepository;
     private final ObtenerCuentaUseCase obtenerCuentaUseCase;
+    private final ObtenerClienteUseCase obtenerClienteUseCase;
 
     public MovimientoService(MovimientoRepositoryPort movimientoRepository,
-                            ObtenerCuentaUseCase obtenerCuentaUseCase) {
+                            ObtenerCuentaUseCase obtenerCuentaUseCase,
+                            ObtenerClienteUseCase obtenerClienteUseCase) {
         this.movimientoRepository = movimientoRepository;
         this.obtenerCuentaUseCase = obtenerCuentaUseCase;
+        this.obtenerClienteUseCase = obtenerClienteUseCase;
     }
 
     @Override
@@ -54,21 +56,53 @@ public class MovimientoService implements CrearMovimientoUseCase, ListarMovimien
 
     @Override
     public List<Movimiento> listarTodos() {
-        return movimientoRepository.buscarTodos();
+        List<Movimiento> movimientos = movimientoRepository.buscarTodos();
+        return enriquecerMovimientos(movimientos);
     }
 
     @Override
     public List<Movimiento> listarPorCuenta(String numeroCuenta) {
-        return movimientoRepository.buscarPorCuenta(numeroCuenta);
+        List<Movimiento> movimientos = movimientoRepository.buscarPorCuenta(numeroCuenta);
+        return enriquecerMovimientos(movimientos);
     }
 
     @Override
     public List<Movimiento> listarPorFechas(LocalDate fechaInicio, LocalDate fechaFin) {
-        return movimientoRepository.buscarPorFechas(fechaInicio, fechaFin);
+        List<Movimiento> movimientos = movimientoRepository.buscarPorFechas(fechaInicio, fechaFin);
+        return enriquecerMovimientos(movimientos);
     }
 
     @Override
     public List<Movimiento> listarPorClienteYFechas(Long clienteId, LocalDate fechaInicio, LocalDate fechaFin) {
-        return movimientoRepository.buscarPorClienteYFechas(clienteId, fechaInicio, fechaFin);
+        List<Movimiento> movimientos = movimientoRepository.buscarPorClienteYFechas(clienteId, fechaInicio, fechaFin);
+        return enriquecerMovimientos(movimientos);
+    }
+
+    private List<Movimiento> enriquecerMovimientos(List<Movimiento> movimientos) {
+        for (Movimiento movimiento : movimientos) {
+            try {
+                // Obtener información de la cuenta
+                Cuenta cuenta = obtenerCuentaUseCase.obtenerPorNumeroCuenta(movimiento.getNumeroCuenta())
+                        .orElse(null);
+                
+                if (cuenta != null) {
+                    movimiento.setTipoCuenta(cuenta.getTipoCuenta());
+                    movimiento.setSaldoInicial(cuenta.getSaldoInicial());
+                    movimiento.setEstadoCuenta(cuenta.getEstado());
+                    
+                    // Obtener información del cliente
+                    if (cuenta.getClienteId() != null) {
+                        Cliente cliente = obtenerClienteUseCase.obtenerPorId(cuenta.getClienteId())
+                                .orElse(null);
+                        if (cliente != null) {
+                            movimiento.setNombreCliente(cliente.getNombre());
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Si no se puede enriquecer, continuar con los datos básicos
+            }
+        }
+        return movimientos;
     }
 }
