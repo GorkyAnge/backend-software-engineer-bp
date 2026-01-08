@@ -69,4 +69,9 @@ public class MovimientoPersistenceAdapter implements MovimientoRepositoryPort {
         return jpaRepository.findFirstByNumeroCuentaOrderByFechaDescIdDesc(numeroCuenta)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public void eliminar(Long id) {
+        jpaRepository.deleteById(id);
+    }
 }
