@@ -69,4 +69,9 @@ public class MovimientoPersistenceAdapter implements MovimientoRepositoryPort {
         return jpaRepository.findFirstByNumeroCuentaOrderByFechaDescIdDesc(numeroCuenta)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public int contarPorCuenta(String numeroCuenta) {
+        return jpaRepository.countByNumeroCuenta(numeroCuenta);
+    }
 }

@@ -12,4 +12,6 @@ public interface CuentaRepositoryPort {
     List<Cuenta> buscarPorCliente(Long clienteId);
     void eliminar(Long id);
     boolean existePorId(Long id);
+    boolean existePorNumeroCuenta(String numeroCuenta);
+    int contarPorCliente(Long clienteId);
 }

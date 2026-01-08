@@ -33,13 +33,9 @@ public class MovimientoController {
 
     @PostMapping
     public ResponseEntity<MovimientoResponse> crear(@RequestBody MovimientoRequest request) {
-        try {
-            Movimiento movimiento = mapper.toDomain(request);
-            Movimiento creado = crearMovimientoUseCase.crear(movimiento);
-            return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creado));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Movimiento movimiento = mapper.toDomain(request);
+        Movimiento creado = crearMovimientoUseCase.crear(movimiento);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.toResponse(creado));
     }
 
     @GetMapping

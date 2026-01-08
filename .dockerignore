@@ -1,0 +1,9 @@
+# Ignorar archivos de Docker
+docker-compose.override.yml
+.dockerignore
+
+# Datos de MySQL
+mysql_data/
+
+# Logs de Docker
+*.log

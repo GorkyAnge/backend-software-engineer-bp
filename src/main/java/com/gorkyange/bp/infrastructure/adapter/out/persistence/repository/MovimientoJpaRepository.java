@@ -27,4 +27,6 @@ public interface MovimientoJpaRepository extends JpaRepository<MovimientoEntity,
             @Param("fechaFin") LocalDate fechaFin);
     
     Optional<MovimientoEntity> findFirstByNumeroCuentaOrderByFechaDescIdDesc(String numeroCuenta);
+    
+    int countByNumeroCuenta(String numeroCuenta);
 }
