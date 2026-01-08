@@ -104,6 +104,7 @@ Ver [DOCKER.md](DOCKER.md) para más detalles.
 ## 📡 API Endpoints
 
 ### Clientes
+
 - `GET /api/clientes` - Listar todos
 - `GET /api/clientes/{id}` - Obtener por ID
 - `POST /api/clientes` - Crear
@@ -111,16 +112,19 @@ Ver [DOCKER.md](DOCKER.md) para más detalles.
 - `DELETE /api/clientes/{id}` - Eliminar
 
 ### Cuentas
+
 - `GET /api/cuentas` - Listar todas
 - `POST /api/cuentas` - Crear
 - `PUT /api/cuentas/{id}` - Actualizar
 - `DELETE /api/cuentas/{id}` - Eliminar
 
 ### Movimientos
+
 - `GET /api/movimientos` - Listar todos
 - `POST /api/movimientos` - Crear movimiento
 
 ### Reportes
+
 - `GET /api/reportes/estado-cuenta?clienteId={id}&fechaInicio={fecha}&fechaFin={fecha}` - JSON
 - `GET /api/reportes/estado-cuenta/pdf?clienteId={id}&fechaInicio={fecha}&fechaFin={fecha}` - PDF base64
 
