@@ -13,5 +13,6 @@ public interface MovimientoRepositoryPort {
     List<Movimiento> buscarPorFechas(LocalDate fechaInicio, LocalDate fechaFin);
     List<Movimiento> buscarPorClienteYFechas(Long clienteId, LocalDate fechaInicio, LocalDate fechaFin);
     Optional<Movimiento> buscarUltimoPorCuenta(String numeroCuenta);
+    int contarPorCuenta(String numeroCuenta);
     void eliminar(Long id);
 }

@@ -29,7 +29,7 @@ public class ClientePersistenceAdapter implements ClienteRepositoryPort {
 
     @Override
     public Optional<Cliente> buscarPorId(Long clienteId) {
-        return jpaRepository.findByClienteId(clienteId)
+        return jpaRepository.findById(clienteId)
                 .map(mapper::toDomain);
     }
 
@@ -44,11 +44,16 @@ public class ClientePersistenceAdapter implements ClienteRepositoryPort {
     @Override
     @Transactional
     public void eliminar(Long clienteId) {
-        jpaRepository.deleteByClienteId(clienteId);
+        jpaRepository.deleteById(clienteId);
     }
 
     @Override
     public boolean existePorId(Long clienteId) {
-        return jpaRepository.existsByClienteId(clienteId);
+        return jpaRepository.existsById(clienteId);
+    }
+
+    @Override
+    public boolean existePorIdentificacion(String identificacion) {
+        return jpaRepository.existsByIdentificacion(identificacion);
     }
 }

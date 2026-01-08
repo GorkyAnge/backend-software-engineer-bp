@@ -71,6 +71,11 @@ public class MovimientoPersistenceAdapter implements MovimientoRepositoryPort {
     }
 
     @Override
+    public int contarPorCuenta(String numeroCuenta) {
+        return jpaRepository.countByNumeroCuenta(numeroCuenta);
+    }
+
+    @Override
     public void eliminar(Long id) {
         jpaRepository.deleteById(id);
     }

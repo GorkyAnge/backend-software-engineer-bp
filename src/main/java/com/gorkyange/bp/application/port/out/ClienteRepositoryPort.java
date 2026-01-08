@@ -10,4 +10,5 @@ public interface ClienteRepositoryPort {
     List<Cliente> buscarTodos();
     void eliminar(Long clienteId);
     boolean existePorId(Long clienteId);
+    boolean existePorIdentificacion(String identificacion);
 }

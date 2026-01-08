@@ -61,4 +61,14 @@ public class CuentaPersistenceAdapter implements CuentaRepositoryPort {
     public boolean existePorId(Long id) {
         return jpaRepository.existsById(id);
     }
+
+    @Override
+    public boolean existePorNumeroCuenta(String numeroCuenta) {
+        return jpaRepository.existsByNumeroCuenta(numeroCuenta);
+    }
+
+    @Override
+    public int contarPorCliente(Long clienteId) {
+        return jpaRepository.countByClienteId(clienteId);
+    }
 }

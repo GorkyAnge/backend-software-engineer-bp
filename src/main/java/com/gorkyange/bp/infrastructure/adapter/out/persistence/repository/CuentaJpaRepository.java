@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface CuentaJpaRepository extends JpaRepository<CuentaEntity, Long> {
     Optional<CuentaEntity> findByNumeroCuenta(String numeroCuenta);
     List<CuentaEntity> findByClienteId(Long clienteId);
+    boolean existsByNumeroCuenta(String numeroCuenta);
+    int countByClienteId(Long clienteId);
 }

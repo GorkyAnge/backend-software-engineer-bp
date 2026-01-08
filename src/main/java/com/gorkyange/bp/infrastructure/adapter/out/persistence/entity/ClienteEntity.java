@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "clientes")
 public class ClienteEntity extends PersonaEntity {
 
-    @Column(name = "cliente_id", nullable = false, unique = true)
+    @Column(name = "cliente_id", unique = true)
     private Long clienteId;
 
     @Column(nullable = false)
