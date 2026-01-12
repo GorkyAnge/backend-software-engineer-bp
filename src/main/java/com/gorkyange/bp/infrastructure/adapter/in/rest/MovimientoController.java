@@ -1,7 +1,6 @@
 package com.gorkyange.bp.infrastructure.adapter.in.rest;
 
-import com.gorkyange.bp.application.port.in.CrearMovimientoUseCase;
-import com.gorkyange.bp.application.port.in.ListarMovimientosUseCase;
+import com.gorkyange.bp.application.port.in.*;
 import com.gorkyange.bp.domain.model.Movimiento;
 import com.gorkyange.bp.infrastructure.adapter.in.rest.dto.MovimientoRequest;
 import com.gorkyange.bp.infrastructure.adapter.in.rest.dto.MovimientoResponse;
@@ -21,13 +20,22 @@ public class MovimientoController {
 
     private final CrearMovimientoUseCase crearMovimientoUseCase;
     private final ListarMovimientosUseCase listarMovimientosUseCase;
+    private final ObtenerMovimientoUseCase obtenerMovimientoUseCase;
+    private final ActualizarMovimientoUseCase actualizarMovimientoUseCase;
+    private final EliminarMovimientoUseCase eliminarMovimientoUseCase;
     private final MovimientoRestMapper mapper;
 
     public MovimientoController(CrearMovimientoUseCase crearMovimientoUseCase,
                                 ListarMovimientosUseCase listarMovimientosUseCase,
+                                ObtenerMovimientoUseCase obtenerMovimientoUseCase,
+                                ActualizarMovimientoUseCase actualizarMovimientoUseCase,
+                                EliminarMovimientoUseCase eliminarMovimientoUseCase,
                                 MovimientoRestMapper mapper) {
         this.crearMovimientoUseCase = crearMovimientoUseCase;
         this.listarMovimientosUseCase = listarMovimientosUseCase;
+        this.obtenerMovimientoUseCase = obtenerMovimientoUseCase;
+        this.actualizarMovimientoUseCase = actualizarMovimientoUseCase;
+        this.eliminarMovimientoUseCase = eliminarMovimientoUseCase;
         this.mapper = mapper;
     }
 
@@ -59,5 +67,34 @@ public class MovimientoController {
                 .collect(Collectors.toList());
         
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MovimientoResponse> obtener(@PathVariable Long id) {
+        return obtenerMovimientoUseCase.obtenerPorId(id)
+                .map(movimiento -> ResponseEntity.ok(mapper.toResponse(movimiento)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MovimientoResponse> actualizar(@PathVariable Long id,
+                                                          @RequestBody MovimientoRequest request) {
+        try {
+            Movimiento movimiento = mapper.toDomain(request);
+            Movimiento actualizado = actualizarMovimientoUseCase.actualizar(id, movimiento);
+            return ResponseEntity.ok(mapper.toResponse(actualizado));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        try {
+            eliminarMovimientoUseCase.eliminar(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
