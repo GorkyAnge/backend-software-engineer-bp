@@ -1,17 +1,16 @@
-version: "3.8"
-
 services:
   # =====================================================
   # Base de Datos SQL Server
   # =====================================================
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: bp-sqlserver
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "BancoPichincha2026!"
       MSSQL_PID: "Developer"
+      MSSQL_COLLATION: "SQL_Latin1_General_CP1_CI_AS"
       TZ: America/Guayaquil
     ports:
       - "1433:1433"
@@ -21,11 +20,15 @@ services:
     networks:
       - bp-network
     healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "BancoPichincha2026!" -Q "SELECT 1" || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'BancoPichincha2026!' -C -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
 
   # =====================================================
   # Aplicación Spring Boot
@@ -49,7 +52,7 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
       # JPA/Hibernate Configuration
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.SQLServerDialect
@@ -59,9 +62,6 @@ services:
 
       # Java Options
       JAVA_OPTS: -Xmx512m -Xms256m -XX:+UseG1GC
-    depends_on:
-      sqlserver:
-        condition: service_healthy
     networks:
       - bp-network
     healthcheck:
